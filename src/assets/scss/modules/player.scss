@@ -1,0 +1,34 @@
+#audioplayer{
+	width: 280px;
+	height: 90px;
+	margin: 0px auto}
+#pButton{
+    height:10px; 
+    width: 2px;
+    border: none;
+    background-size: 50% 50%;
+    background-repeat: no-repeat;
+    background-position: center;
+    float:left;
+    outline:none;}
+.play{width:5px;
+	height:8px;
+	margin-top:0px;
+	background:rgb(216,216,216)}
+.pause{width:5px;
+	height:8px;
+	margin-top:0px;
+	background:rgb(254,207,210)}
+#timeline{
+	width: 250px;
+	height: 10px;
+	margin-left: 5px;
+	float: left;
+	border-radius: 15px;
+	background:rgb(216,216,216)}
+#playhead{
+	width:  8px;
+	height:  8px;
+	border-radius: 50%;
+	margin-top: 1px;
+	background: white;}

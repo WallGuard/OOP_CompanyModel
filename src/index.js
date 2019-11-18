@@ -1,0 +1,7 @@
+import './assets/css/bootstrap.min.css'
+import './assets/scss/main.scss'
+//import './js/bishop.js'
+//import './js/maxsumm'
+import './js/task3'
+//import './js/player'
+//import './assets/scss/modules/player.scss'
