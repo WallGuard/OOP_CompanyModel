@@ -3,13 +3,13 @@ class Director {
     constructor() {
         this.newProject = [];
         this.oldProject = [];
-        this.paidDeveloper = [];
-        this.firedDeveloper = [];
-        this.finishedProject = [];
+        this.hiredDevelopers = [];
+        this.firedDevelopers = [];
+        this.finishedProjects = [];
     }
 
     getProjects() {
-        const projects = customer.generateNewProjects();
+        const projects = order.generateNewProjects();
         this.newProject = projects;
         return projects;
     }
@@ -28,7 +28,7 @@ class Director {
         if (dismission.length) {
             if (dismission.length === 1) {
                 let devIndex = developers.findIndex(obj => obj.id === dismission[0].id);
-                this.firedDeveloper.push(developers[devIndex]);
+                this.firedDevelopers.push(developers[devIndex]);
                 developers.splice(devIndex, 1);
             }
             else {
@@ -37,19 +37,19 @@ class Director {
                     if (a.value < b.value) { return -1; }
                 });
                 let devIndex = developers.findIndex(obj => obj.id === dismission[0].id);
-                this.firedDeveloper.push(developers[devIndex]);
+                this.firedDevelopers.push(developers[devIndex]);
                 developers.splice(devIndex, 1);
             }
         }
-        return this.firedDeveloper[this.firedDeveloper.length - 1];
+        return this.firedDevelopers[this.firedDevelopers.length - 1];
     }
 
     oldProjectDistribution(oldProjects) {
         oldProjects.forEach((item) => {
-            if ((item instanceof WebProject) && (!item.development)) {
+            if ((item instanceof WebProject) && (!item.done)) {
                 this.addDeveloper(item, web);
             }
-            else if ((item instanceof MobileProject) && (!item.development)) {
+            else if ((item instanceof MobileProject) && (!item.done)) {
                 for (let j = 0; j < item.level; j++) {
                     this.addDeveloper(item, mobile);
                 }
@@ -101,7 +101,7 @@ class Director {
             developer = new QADeveloper();
         }
         department.developers.push(developer);
-        this.paidDeveloper.push(department.developers[department.developers.length - 1]);
+        this.hiredDevelopers.push(department.developers[department.developers.length - 1]);
         let lastElem = department.developers.length - 1;
         department.developers[lastElem].projects.push(oldProject);
         department.developers[lastElem].daysOfPass = 0;
@@ -147,8 +147,8 @@ class Department {
         developers.forEach((item) => {
             if ((!item.busyDay) && (!item.daysOfPass)) {
                 let finishedProject = item.projects[item.projects.length - 1];
-                if (!finishedProject.development) {
-                    finishedProject.development = true;
+                if (!finishedProject.done) {
+                    finishedProject.done = true;
                     let freeDeveloper = qa.developers.find(obj => !obj.busyDay);
                     if (freeDeveloper) {
                         freeDeveloper.projects.push(finishedProject);
@@ -169,10 +169,10 @@ class Department {
         developers.forEach((item) => {
             if ((!item.busyDay) && (!item.daysOfPass)) {
                 let finishedProject = item.projects[item.projects.length - 1];
-                director.finishedProject.push(finishedProject);
+                director.finishedProjects.push(finishedProject);
             }
         })
-        return director.finishedProject[director.finishedProject.length - 1];
+        return director.finishedProjects[director.finishedProjects.length - 1];
     }
 
     dayFinished(developers) {
@@ -210,15 +210,13 @@ class Developer {
 }
 
 class WebDeveloper extends Developer { }
-
 class MobileDeveloper extends Developer { }
-
 class QADeveloper extends Developer { }
 
 class Project {
     constructor() {
         this.id = ++Project.id;
-        this.development = false;
+        this.done = false;
     }
 }
 
@@ -236,19 +234,15 @@ class MobileProject extends Project {
     }
 }
 
-class Customer {
+class Order {
 
     generateNewProjects() {
-        const minCount = 0;
-        const maxCount = 4;
-        const needProjectCount = Math.floor(minCount + Math.random() * (maxCount + 1 - minCount));
-        let needProjects = [];
+        const projectCount = Math.floor(Math.random() * 5);
+        let orderedProjects = [];
 
-        for (let i = 0; i < needProjectCount; i++) {
+        for (let i = 0; i < projectCount; i++) {
             let project = null;
-            const minLevel = 1;
-            const maxLevel = 3;
-            const projectLevel = Math.floor(minLevel + Math.random() * (maxLevel + 1 - minLevel));
+            const projectLevel = Math.floor(Math.random() * 3) + 1;
             const projectSpeciality = Math.round(Math.random());
 
             if (projectSpeciality) {
@@ -257,15 +251,16 @@ class Customer {
             else {
                 project = new MobileProject(projectLevel);
             }
-            needProjects.push(project);
+            orderedProjects.push(project);
         }
-        return needProjects;
+        console.log(orderedProjects)
+        return orderedProjects;
     }
 
 }
 
-class Statistics {
-    
+class Statistic {
+
     generate(days) {
         for (let i = 0; i < days; i++) {
             let newProjects = director.getProjects();
@@ -281,26 +276,20 @@ class Statistics {
             mobile.developmentCompleted(mobile.developers);
         }
 
-        const finishedProjects = director.finishedProject.length;
-        const paidDeveloper = director.paidDeveloper.length;
-        const firedDeveloper = director.firedDeveloper.length;
-
-        console.log(
-        `        Количество дней: ${days}
-        Реализовано проектов: ${finishedProjects}
-        Нанято программистов: ${paidDeveloper}
-        Уволено программистов: ${firedDeveloper}`);
+        const finishedProjects = director.finishedProjects.length;
+        const hiredDevelopers = director.hiredDevelopers.length;
+        const firedDevelopers = director.firedDevelopers.length;
 
         return {
             finishedProjects,
-            paidDeveloper,
-            firedDeveloper
+            hiredDevelopers,
+            firedDevelopers
         }
     }
 }
 
-let statistics = new Statistics();
-let customer = new Customer();
+let statistic = new Statistic();
+let order = new Order();
 let director = new Director();
 let web = new Web();
 let mobile = new Mobile();
@@ -308,4 +297,4 @@ let qa = new QA();
 Project.id = 0;
 Developer.id = 0;
 
-statistics.generate(3);
+console.log(statistic.generate(12))
