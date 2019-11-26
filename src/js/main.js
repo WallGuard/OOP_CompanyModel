@@ -15,31 +15,19 @@ class Director {
     }
 
     projectDistribution(oldProjects, newProjects) {
-        if (oldProjects.length) {
-            this.oldProjectDistribution(oldProjects);
-            this.newProjectDistribution(newProjects);
-        }
-        else {
-            this.newProjectDistribution(newProjects);
-        }
+        this.oldProjectDistribution(oldProjects);
+        this.newProjectDistribution(newProjects);
     }
 
     dismissionDeveloper(dismission, developers) {
         if (dismission.length) {
-            if (dismission.length === 1) {
-                let devIndex = developers.findIndex(obj => obj.id === dismission[0].id);
-                this.firedDevelopers.push(developers[devIndex]);
-                developers.splice(devIndex, 1);
-            }
-            else {
-                dismission.sort(function (a, b) {
-                    if (a.value > b.value) { return 1; }
-                    if (a.value < b.value) { return -1; }
-                });
-                let devIndex = developers.findIndex(obj => obj.id === dismission[0].id);
-                this.firedDevelopers.push(developers[devIndex]);
-                developers.splice(devIndex, 1);
-            }
+            dismission.sort(function (a, b) {
+                if (a.value > b.value) { return 1; }
+                if (a.value < b.value) { return -1; }
+            });
+            let devIndex = developers.findIndex(obj => obj.id === dismission[0].id);
+            this.firedDevelopers.push(developers[devIndex]);
+            developers.splice(devIndex, 1);
         }
         return this.firedDevelopers[this.firedDevelopers.length - 1];
     }
@@ -57,30 +45,29 @@ class Director {
                 this.addDeveloper(item, qa);
             }
         })
-        oldProjects.splice(0, oldProjects.length);
-        this.oldProject = oldProjects;
+        this.oldProject = [];
     }
 
     newProjectDistribution(newProjects) {
         let lostProjects = [];
         if (newProjects.length !== 0) {
-            newProjects.forEach((item) => {
-                if (item instanceof WebProject) {
+            newProjects.forEach((project) => {
+                if (project instanceof WebProject) {
                     let freeDeveloper = web.developers.find(obj => !obj.busyDay);
                     if (freeDeveloper) {
-                        this.assignWebProject(freeDeveloper, item);
+                        this.assignWebProject(freeDeveloper, project);
                     }
                     else {
-                        lostProjects.push(item);
+                        lostProjects.push(project);
                     }
                 }
                 else {
                     let freeDeveloper = mobile.developers.filter(obj => !obj.busyDay);
                     if (freeDeveloper.length) {
-                        this.assignMobileProject(freeDeveloper, item);
+                        this.assignMobileProject(freeDeveloper, project);
                     }
                     else {
-                        lostProjects.push(item);
+                        lostProjects.push(project);
                     }
                 }
             })
@@ -101,16 +88,16 @@ class Director {
             developer = new QADeveloper();
         }
         department.developers.push(developer);
-        this.hiredDevelopers.push(department.developers[department.developers.length - 1]);
-        let lastElem = department.developers.length - 1;
-        department.developers[lastElem].projects.push(oldProject);
-        department.developers[lastElem].daysOfPass = 0;
+        this.hiredDevelopers.push(developer);
+
+        developer.projects.push(oldProject);
+        developer.daysOfPass = 0;
 
         if (department instanceof Web) {
-            department.developers[lastElem].busyDay = oldProject.level;
+            developer.busyDay = oldProject.level;
         }
         else {
-            department.developers[lastElem].busyDay = 1;
+            developer.busyDay = 1;
         }
     }
 
@@ -145,6 +132,7 @@ class Department {
     developmentCompleted(developers) {
         let finishedProjects = [];
         developers.forEach((item) => {
+            if (item.busyDay == 0 && item.daysOfPass == 0) throw new Error('tada')
             if ((!item.busyDay) && (!item.daysOfPass)) {
                 let finishedProject = item.projects[item.projects.length - 1];
                 if (!finishedProject.done) {
